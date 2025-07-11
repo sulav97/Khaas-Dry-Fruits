@@ -61,10 +61,9 @@ const MyOrder = () => {
             </thead>
             <tbody className="text-sm text-gray-900">
               {orders.map((order) => {
-                let imgSrc = "";
-                try {
-                  imgSrc = require(`../../assets/${order.dryfruit?.image}`);
-                } catch {}
+                const imgSrc = order.dryfruit?.image 
+                  ? `http://localhost:5000/uploads/${order.dryfruit.image}` 
+                  : "http://localhost:5000/uploads/placeholder.jpg";
                 return (
                   <tr key={order._id} className="border-t hover:bg-gray-50">
                     <td className="px-4 py-3">{order._id.slice(-6)}</td>
@@ -73,6 +72,9 @@ const MyOrder = () => {
                         src={imgSrc}
                         alt={order.dryfruit?.name}
                         className="w-12 h-12 object-cover rounded"
+                        onError={(e) => {
+                          e.target.src = "http://localhost:5000/uploads/placeholder.jpg";
+                        }}
                       />
                     </td>
                     <td className="px-4 py-3">{order.dryfruit?.name}</td>
@@ -82,13 +84,22 @@ const MyOrder = () => {
                     <td className="px-4 py-3">{order.phone}</td>
                     <td className="px-4 py-3">{order.status}</td>
                     <td className="px-4 py-3 text-center">
-                      <button
-                        onClick={() => openCancelModal(order._id)}
-                        className="w-full bg-black text-white px-3 py-1.5 rounded hover:bg-gray-800 transition duration-200 text-xs md:text-sm"
-                        disabled={order.status !== "pending"}
-                      >
-                        Cancel
-                      </button>
+                      {order.status === "pending" ? (
+                        <button
+                          onClick={() => openCancelModal(order._id)}
+                          className="w-full bg-black text-white px-3 py-1.5 rounded hover:bg-gray-800 transition duration-200 text-xs md:text-sm"
+                        >
+                          Cancel
+                        </button>
+                      ) : order.status === "delivered" ? (
+                        <span className="text-green-600 font-semibold text-xs">✓ Delivered</span>
+                      ) : order.status === "shipped" ? (
+                        <span className="text-blue-600 font-semibold text-xs">🚚 Shipped</span>
+                      ) : order.status === "cancelled" ? (
+                        <span className="text-red-600 font-semibold text-xs">❌ Cancelled</span>
+                      ) : (
+                        <span className="text-gray-600 font-semibold text-xs">⏳ Processing</span>
+                      )}
                     </td>
                   </tr>
                 );

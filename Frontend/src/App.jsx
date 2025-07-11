@@ -17,6 +17,11 @@ import AdminDashboard from "./components/admin/AdminDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/ProtectedRoutes/AdminRoute";
 import ProductDetails from "./components/productdetails/productdetails";
+import Success from "./components/Success/Success";
+import PaymentSuccess from "./components/PaymentSuccess/PaymentSuccess";
+import PaymentFailure from "./components/PaymentFailure/PaymentFailure";
+import ForgotPassword from "./components/login/ForgotPassword";
+import ResetPassword from "./components/login/ResetPassword";
 
 
 import { Toaster } from "react-hot-toast";
@@ -39,6 +44,11 @@ const App = () => {
           <Route path="/allproducts" element={<AllProducts />} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+          <Route path="/success" element={<Success />} />
+          <Route path="/paymentsuccess" element={<PaymentSuccess />} />
+          <Route path="/paymentfailure" element={<PaymentFailure />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="*" element={<div className='min-h-screen flex items-center justify-center text-2xl font-bold'>404 - Page Not Found</div>} />
           <Route path="/product/:id" element={<ProductDetails />} />
         </Routes>

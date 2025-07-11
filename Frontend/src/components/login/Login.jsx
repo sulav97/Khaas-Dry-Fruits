@@ -41,9 +41,10 @@ export default function Login() {
         <form className="space-y-5" onSubmit={handleSubmit}>
           <div>
             <label className="text-sm font-medium text-gray-700 block mb-1">
-              EMAIL*
+              EMAIL
             </label>
             <input
+              placeholder="EMAIL"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -55,12 +56,18 @@ export default function Login() {
           <div>
             <input
               type="password"
-              placeholder="PASSWORD*"
+              placeholder="PASSWORD"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-black"
               required
             />
+          </div>
+
+          <div className="text-right mb-2">
+            <Link to="/forgot-password" className="text-sm text-black-600 hover:underline">
+              Forgot Password?
+            </Link>
           </div>
 
           <button

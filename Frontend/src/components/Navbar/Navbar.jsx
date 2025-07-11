@@ -53,9 +53,13 @@ export default function Navbar() {
     <header className="w-full bg-white shadow-sm sticky top-0 z-50">
       <div className="w-full px-4 py-4 flex items-center justify-between">
         {/* Left: Logo */}
-        <div className="text-2xl font-bold text-gray-800 tracking-wide ml-14">
-          Khaas <span className="text-red-500">DryFruits</span>
-        </div>
+        <Link
+  to="/"
+  className="text-2xl font-bold text-gray-800 tracking-wide ml-14 hover:opacity-90 transition"
+>
+  Khaas <span className="text-red-500">DryFruits</span>
+</Link>
+
 
         {/* Center: Navigation */}
         <nav className="hidden lg:flex gap-10 text-base font-medium text-gray-700">

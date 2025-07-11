@@ -9,6 +9,11 @@ router.post("/register", authController.register);
 // Login route
 router.post("/login", authController.login);
 
+// Forgot Password
+router.post("/forgot-password", authController.forgotPassword);
+// Reset Password
+router.post("/reset-password/:token", authController.resetPassword);
+
 // ✅ Current user route - returns logged-in user info from token
 router.get("/me", auth, (req, res) => {
   const { _id, name, email, isAdmin } = req.user;

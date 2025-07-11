@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { ShoppingCart, Heart } from "lucide-react";
+import { Heart } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import { useCart } from "../../context/CartContext";
 import { getAllDryfruits } from "../../api/api";
@@ -23,10 +23,8 @@ export default function AllProducts() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const location = useLocation();
   const query = useQuery();
 
-  // Read search query from URL
   const search = query.get("search") || "";
   const debouncedSearch = useDebouncedValue(search, 250);
 
@@ -43,18 +41,13 @@ export default function AllProducts() {
       });
   }, []);
 
-  // Generate categories from backend data
-  const categories = [
-    "All",
-    ...Array.from(new Set(products.map((p) => p.name)))
-  ];
+  const categories = ["All", ...Array.from(new Set(products.map((p) => p.name)))];
 
-  // Filter by category first
-  const categoryFiltered = selectedCategory === "All"
-    ? products
-    : products.filter((p) => p.name === selectedCategory);
+  const categoryFiltered =
+    selectedCategory === "All"
+      ? products
+      : products.filter((p) => p.name === selectedCategory);
 
-  // Then filter by search
   const filtered = useMemo(() => {
     if (!debouncedSearch.trim()) return categoryFiltered;
     const term = debouncedSearch.trim().toLowerCase();
@@ -104,55 +97,113 @@ export default function AllProducts() {
   );
 }
 
+import { useNavigate } from "react-router-dom";
+
 function ProductCard({ product }) {
   const { addToCart } = useCart();
-  const { _id, name, pricePerGram, image, stock } = product;
+  const { _id, name, pricePerGram, stock, image } = product;
+  const [weight, setWeight] = useState(100);
+  const navigate = useNavigate();
 
-  const imgSrc = image ? `http://localhost:5000/uploads/${image}` : "http://localhost:5000/uploads/placeholder.jpg";
-
-  const defaultWeight = 100;
-  const finalPrice = Math.round((pricePerGram || 0) * defaultWeight);
+  const imgSrc = image
+    ? `http://localhost:5000/uploads/${image}`
+    : "http://localhost:5000/uploads/placeholder.jpg";
+  const price = Math.round(pricePerGram * weight);
+  const originalPrice = Math.round(price * 1.02);
+  const pricePerGramDisplay = pricePerGram.toFixed(2);
 
   const handleAddToCart = (e) => {
     e.preventDefault();
-    addToCart({ id: _id, title: name, price: finalPrice, image: imgSrc, stock, weight: defaultWeight, pricePerGram });
-    toast.success(`${name} added to cart!`);
+    e.stopPropagation();
+    addToCart({
+      id: _id,
+      title: `${name} ${weight}g`,
+      price: price,
+      image: imgSrc,
+      stock,
+    });
+    toast.success(`${name} (${weight}g) added to cart!`);
+  };
+
+  const handleCardClick = () => {
+    navigate(`/product/${_id}`);
   };
 
   return (
-    <Link to={`/product/${_id}`} className="block group focus:outline-none">
-      <div className="relative bg-white rounded-xl border border-gray-300 shadow hover:shadow-lg transition p-4 group-hover:ring-2 group-hover:ring-black">
-        <div className="absolute top-3 left-3 bg-black text-white text-xs font-semibold px-2 py-0.5 rounded">
+    <div
+      className="block group focus:outline-none"
+      onClick={handleCardClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === "Enter" && handleCardClick()}
+    >
+      <div
+        className="relative rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all text-white text-center"
+        style={{
+          backgroundImage: `url(${imgSrc})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          minHeight: "440px",
+        }}
+      >
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+
+        {/* Top Labels */}
+        <div className="absolute top-2 left-2 bg-white text-black text-xs font-bold px-2 py-0.5 rounded z-10">
           PREMIUM
         </div>
-        <div className="absolute top-3 right-3 bg-gray-100 text-black text-xs font-semibold px-2 py-0.5 rounded-full">
+        <div className="absolute top-2 right-2 bg-white text-black text-xs font-bold px-2 py-0.5 rounded-full z-10">
           2% off
         </div>
-        <img src={imgSrc} alt={name} className="w-full h-44 object-contain my-2" />
-        <div className="mt-4 space-y-1">
-          <p className="text-xs text-gray-500 font-bold uppercase">KHAAS</p>
-          <h3 className="text-base font-semibold">{name} {defaultWeight}g</h3>
-          <div className="flex items-center justify-between text-sm text-gray-600">
-            <span className="line-through">NPR: Rs {Math.round(finalPrice * 1.02)}</span>
-            <div className="flex items-center gap-1">
-              <span>4.9</span>
-              <Heart size={14} className="text-black fill-black" />
+
+        {/* Product Name (bottom center above info section) */}
+        <div className="absolute bottom-14 left-1/2 transform -translate-x-1/2 z-10">
+          <h3 className="text-lg font-bold text-white">{name}</h3>
+        </div>
+
+        {/* Bottom-aligned content */}
+        <div className="absolute bottom-0 left-0 right-0 px-4 pt-3 pb-4 z-10 flex flex-col">
+          {/* Weight & Price Row */}
+          <div className="flex justify-between items-end mb-3">
+            {/* Weight Selector */}
+            <div className="text-left">
+              <label className="text-xs text-white mb-1 block">Weight</label>
+              <select
+                value={weight}
+                onChange={(e) => setWeight(parseInt(e.target.value))}
+                onClick={(e) => e.stopPropagation()} // prevent navigation
+                className="bg-white/10 border border-white text-white text-sm px-3 py-1 rounded w-30 backdrop-blur-sm appearance-none"
+              >
+                <option className="bg-black text-white" value={100}>100g</option>
+                <option className="bg-black text-white" value={250}>250g</option>
+                <option className="bg-black text-white" value={500}>500g</option>
+                <option className="bg-black text-white" value={1000}>1kg</option>
+              </select>
+            </div>
+
+            {/* Price & Rating */}
+            <div className="text-right text-sm text-white">
+              <span className="line-through text-gray-300 block text-xs">Rs {originalPrice}</span>
+              <div className="flex items-center justify-end gap-1 text-sm">
+                <span>4.9</span>
+                <Heart size={14} className="text-white fill-white" />
+              </div>
+              <span className="text-lg font-bold block leading-tight">Rs {price}</span>
+              <span className="text-xs text-gray-200">(Rs {pricePerGramDisplay}/g)</span>
             </div>
           </div>
-          <p className="text-[15px] font-bold text-black">
-            Rs {finalPrice} <span className="text-xs font-normal text-gray-500">(Rs {pricePerGram?.toFixed(2)}/g)</span>
-          </p>
+
+          {/* Add to Cart Button */}
+          <button
+            onClick={handleAddToCart}
+            disabled={stock === 0}
+            className="w-full bg-black text-white text-sm py-2 px-4 rounded hover:bg-white hover:text-black transition"
+          >
+            🛒 {stock === 0 ? "Out of Stock" : "Add To Cart"}
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={handleAddToCart}
-          className="w-full mt-4 bg-black hover:bg-gray-900 text-white text-sm py-2 rounded-md transition"
-          disabled={stock === 0}
-        >
-          <ShoppingCart size={16} className="inline-block mr-2" />
-          {stock === 0 ? "Out of Stock" : "Add To Cart"}
-        </button>
       </div>
-    </Link>
+    </div>
   );
 }

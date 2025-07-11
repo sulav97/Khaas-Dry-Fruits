@@ -1,18 +1,17 @@
+require('dotenv').config();
 const express = require("express");
-const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const cors = require("cors");
 const path = require("path");
 const userRoutes = require("./routes/userRoutes");
 
-dotenv.config();
 connectDB();
 
 const app = express();
 
 // ✅ Allow frontend (Vite) to access API
 app.use(cors({
-  origin: "http://localhost:5173", // your frontend origin
+  origin: ["http://localhost:5173", "http://localhost:3000"], // your frontend origin
   credentials: true
 }));
 

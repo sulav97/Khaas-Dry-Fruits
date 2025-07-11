@@ -214,7 +214,16 @@ function ProductManagement({ setError }) {
                 return (
                   <tr key={p._id} className="border-t hover:bg-gray-50">
                     <td className="px-4 py-3 font-semibold">{p.name}</td>
-                    <td className="px-4 py-3"><img src={imgSrc} alt={p.name} className="h-10 w-10 object-contain rounded" /></td>
+                    <td className="px-4 py-3">
+                      <img 
+                        src={imgSrc} 
+                        alt={p.name} 
+                        className="h-10 w-10 object-contain rounded"
+                        onError={(e) => {
+                          e.target.src = "http://localhost:5000/uploads/placeholder.jpg";
+                        }}
+                      />
+                    </td>
                     <td className="px-4 py-3">Rs {p.pricePerGram}</td>
                     <td className="px-4 py-3">{p.stock}</td>
                     <td className="px-4 py-3 space-x-2">
